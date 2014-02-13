@@ -45,6 +45,19 @@ class TestAddUser(testLib.RestTestCase):
         respData1 = self.makeRequest("/users/add", method="POST", data = { 'user' : 'user1', 'password' : 'password'} )
         self.assertResponse(respData1, None, testLib.RestTestCase.ERR_USER_EXISTS)
 
+    def testAddUserWithEmptyUserName(self):
+        respData = self.makeRequest("/users/add", method="POST", data = { 'user' : '', 'password' : 'password'} )
+        self.assertResponse(respData, None, testLib.RestTestCase.ERR_BAD_USERNAME)
+
+    def testAddUserWithTooLongUserName(self):
+        name = 'thisstringwillbeover128characteresinlengthhopefullyafterIwritethissentencethisstringwillbeover128characteresinlengthhopefullyafterIwritethissentence'
+        respData = self.makeRequest("/users/add", method="POST", data = { 'user' : name, 'password' : 'password'} )
+        self.assertResponse(respData, None, testLib.RestTestCase.ERR_BAD_USERNAME)
+
+    def testAddUserWithTooLongPassword(self):
+        pwd = 'thisstringwillbeover128characteresinlengthhopefullyafterIwritethissentencethisstringwillbeover128characteresinlengthhopefullyafterIwritethissentence'
+        respData = self.makeRequest("/users/add", method="POST", data = { 'user' : 'user1', 'password' : pwd} )
+        self.assertResponse(respData, None, testLib.RestTestCase.ERR_BAD_PASSWORD)
     
 class TestLoginUser(testLib.RestTestCase):
     """Test Login Users"""
@@ -64,6 +77,13 @@ class TestLoginUser(testLib.RestTestCase):
         expected = { 'errCode' : errCode, 'count' : 2 }
         self.assertDictEqual(expected, respData)
 
+    def assertBadLoginResponse(self, respData, errCode = testLib.RestTestCase.ERR_BAD_CREDENTIALS):
+        """
+        Check that the response data dictionary matches the expected values
+        """
+        expected = { 'errCode' : errCode}
+        self.assertDictEqual(expected, respData)
+
     def testLogin(self):
         # add user
         respData = self.makeRequest("/users/add", method="POST", data = { 'user' : 'user1', 'password' : 'password'} )
@@ -72,6 +92,16 @@ class TestLoginUser(testLib.RestTestCase):
         # login user
         respData = self.makeRequest("/users/login", method="POST", data = { 'user' : 'user1', 'password' : 'password'} )
         self.assertLoginResponse(respData)
+
+    def testLoginWithWrongPassword(self):
+        # add user
+        respData = self.makeRequest("/users/add", method="POST", data = { 'user' : 'user1', 'password' : 'password'} )
+        self.assertAddResponse(respData, count = 1)
+
+        # login user
+        respData = self.makeRequest("/users/login", method="POST", data = { 'user' : 'user1', 'password' : 'password1'} )
+        self.assertBadLoginResponse(respData)
+
 
 class TestResetFixtureUser(testLib.RestTestCase):
     """Test Reset Fixture Users"""
