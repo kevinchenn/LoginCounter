@@ -11,7 +11,6 @@ Twisted==12.2.0
 Werkzeug==0.9.4
 altgraph==0.10.1
 bdist-mpkg==0.4.4
-bonjour-py==0.3
 dj-database-url==0.2.2
 dj-static==0.0.5
 django-filter==0.7
