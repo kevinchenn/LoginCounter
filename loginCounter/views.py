@@ -81,7 +81,7 @@ def testAPI_unitTests(request):
 	result = runner.run(unittest.makeSuite(UserTestCase))
 	stream.seek(0)
 
-	data = { 'nrFailed': len(result.failures), 'output':stream.read() , 'totalTests': result.testsRun}
+	data = { 'nrFailed': len(result.errors), 'output':stream.read() , 'totalTests': result.testsRun}
 	return Response(data)
 
 
