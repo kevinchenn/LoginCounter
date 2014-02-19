@@ -62,3 +62,17 @@ class User(models.Model):
     def resetFixture(self):
     	User.objects.all().delete()
     	return User.SUCCESS
+
+    def errorMessage(self, errCode):
+        if errCode == User.ERR_BAD_USERNAME:
+            return 'Bad Username!'
+        elif errCode == User.ERR_BAD_PASSWORD:
+            return 'Bad Password!'
+        elif errCode == User.ERR_USER_EXISTS:
+            return 'Username Already Exists!'
+        elif errCode == User.ERR_BAD_CREDENTIALS:
+            return 'Bad credentials! Incorrect username/password'
+        elif errCode == User.MAX_PASSWORD_LENGTH:
+            return 'Password exceeds 128 characters'
+        elif errCode == User.MAX_USERNAME_LENGTH:
+            return 'Username must not be empty and must also be under 128 characters'

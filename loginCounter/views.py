@@ -1,4 +1,5 @@
 from django.http import HttpResponse
+from django.shortcuts import render
 from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.renderers import JSONRenderer
@@ -8,6 +9,9 @@ from loginCounter.models import User
 from loginCounter.serializers import UserSerializer
  
  
+def index(request):
+	return render(request, 'index.html')
+
 @api_view(['POST'])
 def user_add(request):
 	"""
@@ -84,5 +88,29 @@ def testAPI_unitTests(request):
 	data = { 'nrFailed': len(result.errors), 'output':stream.read() , 'totalTests': result.testsRun}
 	return Response(data)
 
+def view_add(request):
+	user = User()
+	errCode = user.add(request.POST['user'], request.POST['password'])
+	data = { 'errCode': errCode }
+	if (errCode == User.SUCCESS):
+		newUser = User.objects.get(user=request.POST['user'], password=request.POST['password'])
+		data['count'] = newUser.count
+	
+	if 'count' not in data:
+		return render(request, 'index.html', {'error_message': user.errorMessage(errCode)})
+
+	return render(request, 'login.html', {'user': request.POST['user'], 'count': newUser.count})
 
 
+def view_login(request):
+	user = User()
+	errCode = user.login(request.POST['user'], request.POST['password'])
+	data = { 'errCode': errCode }
+	if (errCode == User.SUCCESS):
+		thisUser = User.objects.get(user=request.POST['user'], password=request.POST['password'])
+		data['count'] = thisUser.count
+	
+	if 'count' not in data:
+		return render(request, 'index.html', {'error_message': user.errorMessage(errCode)})
+
+	return render(request, 'login.html', {'user': request.POST['user'], 'count': thisUser.count})
